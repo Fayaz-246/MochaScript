@@ -1,6 +1,6 @@
 @ This is a test of all language features
 
-def message = "Looping from 0 to 4:";
+def message = "Hello GitHub";
 writeln("Starting Program...");
 writeln(message);
 
