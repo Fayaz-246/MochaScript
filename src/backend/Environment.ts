@@ -1,6 +1,6 @@
 type alphanum = string | number;
 
-export class Env {
+export default class Env {
   private variables: Map<string, alphanum>;
   private functions: Map<string, string>;
 

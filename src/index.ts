@@ -3,7 +3,7 @@ import lex from "./lang/lexer.js";
 import parse from "./lang/parse.js";
 import { interpret } from "./lang/interpret.js";
 // import readline from "readline";
-import { Env } from "./backend/Environment.js";
+import Env from "./backend/Environment.js";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { Token } from "./extra/types.js";

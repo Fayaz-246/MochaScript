@@ -1,4 +1,4 @@
-import { Env } from "../backend/Environment.js";
+import Env from "../backend/Environment.js";
 import { keywords, Statements } from "../extra/enums.js";
 import {
   BinaryExpressionValue,
