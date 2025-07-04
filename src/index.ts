@@ -1,6 +1,6 @@
 import fs from "node:fs";
-import { lex } from "./lang/lexer.js";
-import { parse } from "./lang/parse.js";
+import lex from "./lang/lexer.js";
+import parse from "./lang/parse.js";
 import { interpret } from "./lang/interpret.js";
 // import readline from "readline";
 import { Env } from "./backend/Environment.js";

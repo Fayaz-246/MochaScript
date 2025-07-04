@@ -27,27 +27,31 @@ const operatorPrecedence: Record<string, number> = {
 };
 const rightAssociative = new Set(["^"]);
 
-/* ─────────────────────── Parser Driver ─────────────────────── */
-export function parse(tokens: Token[]): Node[] {
+/** --------------------------------------------------------------------------
+ * Parse the tokens into an AST.
+ * -------------------------------------------------------------------------- */
+export default function parse(tokens: Token[]): Node[] {
   let cur = 0;
 
   /* —— Helpers —— */
   const peek = () => tokens[cur];
-  const get = () => tokens[cur++];
+  const advance = () => tokens[cur++];
   const expect = (t: types) => {
-    const tk = get();
+    const tk = advance();
     if (!tk || tk.type !== t) {
-      throw new Error(`Expected token ${t}, got ${JSON.stringify(tk)}`);
+      throw new Error(
+        `Expected token ${t}, got ${JSON.stringify(tk, null, 1)}`
+      );
     }
     return tk;
   };
   function skipComments() {
-    while (peek()?.type === types.comment) get();
+    while (peek()?.type === types.comment) advance();
   }
 
   /* —— parsePrimary: number, identifier, or parenthesized expr —— */
   function parsePrimary(): Node {
-    const tk = get();
+    const tk = advance();
     if (!tk) throw new Error("Unexpected EOF in primary");
 
     if (tk.type === types.numeric) {
@@ -83,7 +87,7 @@ export function parse(tokens: Token[]): Node[] {
       const prec = operatorPrecedence[opTk.value!];
       if (prec < minPrec) break;
 
-      get();
+      advance();
 
       const nextMin = rightAssociative.has(opTk.value!) ? prec : prec + 1;
       const rightNode = parseBinaryExpression(nextMin);
@@ -107,35 +111,39 @@ export function parse(tokens: Token[]): Node[] {
     const tk = peek()!;
     switch (tk.type) {
       case types.comment:
-        const c = get()!;
+        const c = advance()!;
         return { identifier: Statements.CommentStatement, value: c.value! };
 
       case types.def:
-        get();
-        return parseDeclaration();
+        advance();
+        return parseVariableDeclarationAndAssignment(
+          Statements.DeclarationStatement
+        );
 
       case types.alpha:
       case types.alphanum:
-        return parseAssignment();
+        return parseVariableDeclarationAndAssignment(
+          Statements.AssignmentStatement
+        );
 
       case types.if:
-        get();
+        advance();
         return parseIf();
 
       case types.for:
-        get();
+        advance();
         return parseFor();
 
       case types.ret:
-        get();
+        advance();
         return parseReturn();
 
       case types.write:
-        get();
+        advance();
         return parseWrite();
 
       case types.writeln:
-        get();
+        advance();
         return parseWriteLine();
 
       default:
@@ -143,8 +151,10 @@ export function parse(tokens: Token[]): Node[] {
     }
   }
 
-  /* —— parseDeclaration: def x = <expr|string>; —— */
-  function parseDeclaration(): Node {
+  /* -- parseAssignment: def x =  <expr|string>; || x = <expr|string>; —— */
+  function parseVariableDeclarationAndAssignment(
+    type: Statements.AssignmentStatement | Statements.DeclarationStatement
+  ): Node {
     const idTk = expect(
       peek()!.type === types.alphanum ? types.alphanum : types.alpha
     );
@@ -152,7 +162,7 @@ export function parse(tokens: Token[]): Node[] {
 
     let valueNode: Node;
     if (peek()?.type === types.str_dec) {
-      get();
+      advance();
       const strTk = expect(types.str);
       expect(types.str_dec);
       valueNode = { identifier: Statements.StringLiteral, value: strTk.value! };
@@ -162,34 +172,7 @@ export function parse(tokens: Token[]): Node[] {
     expect(types.semi);
 
     return {
-      identifier: Statements.DeclarationStatement,
-      value: {
-        identifier: idTk.value!,
-        value: valueNode,
-      } as DeclarationStatementValue,
-    };
-  }
-
-  /* -- parseAssignment: x = <expr|string>; —— */
-  function parseAssignment(): Node {
-    const idTk = expect(
-      peek()!.type === types.alphanum ? types.alphanum : types.alpha
-    );
-    expect(types.assign);
-
-    let valueNode: Node;
-    if (peek()?.type === types.str_dec) {
-      get();
-      const strTk = expect(types.str);
-      expect(types.str_dec);
-      valueNode = { identifier: Statements.StringLiteral, value: strTk.value! };
-    } else {
-      valueNode = parseBinaryExpression();
-    }
-    expect(types.semi);
-
-    return {
-      identifier: Statements.AssignmentStatement,
+      identifier: type,
       value: {
         identifier: idTk.value!,
         value: valueNode,
@@ -202,7 +185,7 @@ export function parse(tokens: Token[]): Node[] {
     // condition (parentheses optional)
     let condition: Node;
     if (peek()?.type === types.left_paren) {
-      get();
+      advance();
       condition = parseBinaryExpression();
       expect(types.right_paren);
     } else {
@@ -222,10 +205,10 @@ export function parse(tokens: Token[]): Node[] {
 
     const elseIfs: ElseIfClause[] = [];
     while (peek()?.type === types.elif) {
-      get();
+      advance();
       let ec: Node;
       if (peek()?.type === types.left_paren) {
-        get();
+        advance();
         ec = parseBinaryExpression();
         expect(types.right_paren);
       } else {
@@ -243,7 +226,7 @@ export function parse(tokens: Token[]): Node[] {
 
     let elseBranch: Node[] | undefined;
     if (peek()?.type === types.else) {
-      get();
+      advance();
       expect(types.left_brace);
       elseBranch = [];
       while (peek()?.type !== types.right_brace) {
@@ -264,10 +247,14 @@ export function parse(tokens: Token[]): Node[] {
 
     let init: Node;
     if (peek()?.type === types.def) {
-      get();
-      init = parseDeclaration();
+      advance();
+      init = parseVariableDeclarationAndAssignment(
+        Statements.DeclarationStatement
+      );
     } else {
-      init = parseAssignment();
+      init = parseVariableDeclarationAndAssignment(
+        Statements.AssignmentStatement
+      );
     }
 
     const condition = parseBinaryExpression();
@@ -323,7 +310,7 @@ export function parse(tokens: Token[]): Node[] {
       expect(types.left_paren);
       let payload: WriteStatementValue;
       if (peek()?.type === types.str_dec) {
-        get();
+        advance();
         const s = expect(types.str);
         expect(types.str_dec);
         payload = { text: s.value! };

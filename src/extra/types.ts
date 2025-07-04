@@ -14,9 +14,7 @@ export interface DeclarationStatementValue {
 
 /** Payload for `write(...)` / `writeln(...)` statements */
 export interface WriteStatementValue {
-  /** String literal: `write("hello")` */
   text?: string;
-  /** Any expression: `write(1+2)` or `write(x)` */
   expr?: Node;
 }
 
@@ -41,10 +39,10 @@ export interface IfStatementValue {
 }
 
 export interface ForStatementValue {
-  init: Node; // e.g. a DeclarationStatement or an AssignmentStatement
-  condition: Node; // any expression node
-  update: Node; // any expression node
-  body: Node[]; // array of statements
+  init: Node;
+  condition: Node;
+  update: Node;
+  body: Node[];
 }
 
 /** The AST node types for the language */

@@ -39,7 +39,7 @@ writeln(name);
 
 @ Complex expression
 def z = (5 + 3) * 2 ^ 2;
-writeln("z = ");
+write("z = ");
 writeln(z);
 
 @ Final return
