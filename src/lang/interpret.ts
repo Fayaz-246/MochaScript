@@ -1,4 +1,4 @@
-import Env from "../backend/Environment.js";
+import Env, { AlphaNumBool, VariableValue } from "../backend/Environment.js";
 import { keywords, Statements } from "../extra/enums.js";
 import {
   BinaryExpressionValue,
@@ -16,7 +16,7 @@ const stdout = (s: string) => process.stdout.write(s);
  * Evaluate an expression Node to a JS number or string.
  * Supports: literals, identifiers, binary ops, nested returns.
  * -------------------------------------------------------------------------- */
-function evalExpr(node: Node, runtime: Env): number | string {
+function evalExpr(node: Node, runtime: Env): AlphaNumBool {
   switch (node.identifier) {
     case Statements.NumberLiteral:
       return node.value as number;
@@ -24,11 +24,14 @@ function evalExpr(node: Node, runtime: Env): number | string {
     case Statements.StringLiteral:
       return node.value as string;
 
+    case Statements.Boolean:
+      return node.value as boolean;
+
     case Statements.Identifier: {
       const name = node.value as string;
       const v = runtime.getVar(name);
       if (v === undefined) throw new Error(`Unknown variable: ${name}`);
-      return v;
+      return v.value;
     }
 
     case Statements.BinaryExpression: {
@@ -79,20 +82,22 @@ function evalExpr(node: Node, runtime: Env): number | string {
 function evalStmt(node: Node, runtime: Env): any {
   switch (node.identifier) {
     case Statements.DeclarationStatement: {
-      const { identifier, value } = node.value as DeclarationStatementValue;
+      const { identifier, value, mutable } =
+        node.value as DeclarationStatementValue;
       if (keywords.includes(identifier)) {
         throw new Error(`Identifier cannot be a keyword: ${identifier}`);
       }
       const val = evalExpr(value as Node, runtime);
-      runtime.declareVar(identifier, val);
+      runtime.declareVar(identifier, { value: val, mutable });
       return;
     }
+
     case Statements.AssignmentStatement: {
       const { identifier, value } = node.value as DeclarationStatementValue;
       if (!runtime.hasVar(identifier))
         throw new Error("Cannot assign to an undeclared variable.");
       const val = evalExpr(value as Node, runtime);
-      runtime.declareVar(identifier, val);
+      runtime.assignVar(identifier, val);
       return;
     }
 

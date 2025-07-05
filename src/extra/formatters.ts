@@ -44,8 +44,10 @@ const nodeFormatters: Partial<Record<Statements, (n: Node) => string>> = {
   },
 
   [Statements.DeclarationStatement]: (n) => {
-    const { identifier, value } = n.value as DeclarationStatementValue;
-    return `Declare ${identifier} = ${formatExpr(value)}`;
+    const { identifier, value, mutable } = n.value as DeclarationStatementValue;
+    return `Declare ${
+      mutable === false ? "" : "Mutable "
+    }${identifier} = ${formatExpr(value)}`;
   },
 
   [Statements.AssignmentStatement]: (n) => {
@@ -99,6 +101,8 @@ const nodeFormatters: Partial<Record<Statements, (n: Node) => string>> = {
   },
 
   [Statements.ReturnStatement]: (n) => `Return ${formatExpr(n.value as Node)}`,
+
+  [Statements.Boolean]: (n) => `Bool(${n.value})`,
 
   [Statements.CommentStatement]: (n) => `Comment(${JSON.stringify(n.value)})`,
 };

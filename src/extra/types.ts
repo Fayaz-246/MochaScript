@@ -7,9 +7,13 @@ export type Token = {
 };
 
 /** Payload for a `def x = <expr>;` statement */
-export interface DeclarationStatementValue {
+export interface AssignmentStatementValue {
   identifier: string;
   value: Node;
+}
+
+export interface DeclarationStatementValue extends AssignmentStatementValue {
+  mutable: boolean;
 }
 
 /** Payload for `write(...)` / `writeln(...)` statements */
@@ -50,6 +54,7 @@ export type Node =
   /* ── Literals ───────────────────────────────────── */
   | { identifier: Statements.NumberLiteral; value: number }
   | { identifier: Statements.StringLiteral; value: string }
+  | { identifier: Statements.Boolean; value: boolean }
 
   /* ── Identifiers ────────────────────────────────── */
   | { identifier: Statements.Identifier; value: string }
@@ -67,7 +72,7 @@ export type Node =
     }
   | {
       identifier: Statements.AssignmentStatement;
-      value: DeclarationStatementValue;
+      value: AssignmentStatementValue;
     }
   | { identifier: Statements.WriteStatement; value: WriteStatementValue }
   | { identifier: Statements.WriteLineStatement; value: WriteStatementValue }

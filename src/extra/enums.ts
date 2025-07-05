@@ -8,6 +8,8 @@ export const keywords: string[] = [
   "elif",
   "else",
   "for",
+  "true",
+  "false",
 ] as const;
 
 // TOKEN TYPES
@@ -19,6 +21,7 @@ export enum types {
   comparison_ops, // > < >= <= == !=
   comment, // @…newline comments
   def, // 'def' keyword
+  mut, // mutable variables
 
   // grouping: ()[]{} stay together
   left_paren, // (
@@ -41,6 +44,10 @@ export enum types {
   // For
   for,
 
+  // Booleans
+  true,
+  false,
+
   write, // 'write' keyword
   writeln, // 'writeln' keyword
 
@@ -54,6 +61,7 @@ export enum Statements {
   Identifier, // variable names
   NumberLiteral, // numeric literal
   StringLiteral, // string literal
+  Boolean,
 
   IfStatement,
   ForStatement,

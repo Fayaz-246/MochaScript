@@ -5,7 +5,7 @@ import { Token } from "../extra/types.js";
  * Return an array of tokens from the file.
  * -------------------------------------------------------------------------- */
 export default function lex(input: string): Token[] {
-  const tokens: Token[] = [];
+  const tokens = new Array<Token>();
   let i = 0;
 
   const peek = (n = 0) => input[i + n];
@@ -24,6 +24,9 @@ export default function lex(input: string): Token[] {
     elif: types.elif,
     else: types.else,
     for: types.for,
+    true: types.true,
+    false: types.false,
+    mut: types.mut,
   };
 
   const singleCharMap: Record<string, Token> = {
