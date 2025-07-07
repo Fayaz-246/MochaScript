@@ -5,7 +5,8 @@
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "rb": "tsc && node ."
+    "rb": "tsc && node .",
+    "test": "jest --colors --verbose"
   },
   "keywords": [],
   "author": "",
@@ -15,5 +16,10 @@
     "@types/node": "^24.0.7",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "jest": "^30.0.4",
+    "ts-jest": "^29.4.0"
   }
 }

@@ -1,46 +1,48 @@
-@ This is a test of all language features
+@===============================================
+@ MochaScript Feature Coverage Test
+@===============================================
 
-def message = "Hello GitHub";
-writeln("Starting Program...");
-writeln(message);
+@---- Variables & Mutability ----
+def x = 5;                   @ immutable integer
+def mut y = 3;                   @ mutable integer
+writeln("x = "); write(x); writeln("");   
+writeln("y initial = "); write(y); writeln("");
 
-@ Simple arithmetic + write
-def x = 2 + 3 * 4;
-write("x = "); 
-writeln(x);
+y = y + 7;                   @ reassign mutable variable
+writeln("y after mutation = "); writeln(y);
 
-@ Testing if/elif/else
-def val = 7;
+@---- Arithmetic & Comparisons ----
+def sum = x + y * 2 - (y / 5) % 3 ^ 2;
+writeln("sum = "); writeln(sum);
 
-if (val < 5) {
-  writeln("val is less than 5");
-} elif (val == 7) {
-  writeln("val is exactly 7");
+def isBig    = sum > 20;
+def isEqual  = sum == 19;
+def isSmall  = sum < 10;
+writeln("isBig = "); writeln(isBig);
+writeln("isEqual = "); writeln(isEqual);
+writeln("isSmall = "); writeln(isSmall);
+
+@---- Booleans & If/Elif/Else ----
+if isBig {
+  writeln("Branch: sum is big");
+} elif isEqual {
+  writeln("Branch: sum equals 19");
 } else {
-  writeln("val is something else");
+  writeln("Branch: sum is small or medium");
 }
 
-@ Now do a loop
-for (def i = 0; i < 5; i = i + 1) {
-  write("i = "); writeln(i);
+@---- For Loop ----
+for(def i = 0; i < 5; i = i + 1) {
+  write("Loop iteration i = "); writeln(i);
 }
 
+@---- Strings & Concatenation ----
+def greeting = "Hello";
+def name     = "MochaScript";
+writeln(greeting + ", " + name + "!");
 
-@ Assignments
-val = 10;
-writeln("Updated val:");
-writeln(val);
+@---- Comments ----
+@ This entire line is a comment and should be ignored by the lexer/parser
 
-
-@ String reassignment
-def name = "World";
-write("Hello, ");
-writeln(name);
-
-@ Complex expression
-def z = (5 + 3) * 2 ^ 2;
-write("z = ");
-writeln(z);
-
-@ Final return
-ret 69;
+@---- Return (exit code) ----
+ret 0;   @ should terminate execution with code 0
